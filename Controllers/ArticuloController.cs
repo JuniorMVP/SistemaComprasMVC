@@ -57,7 +57,7 @@ namespace SistemaComprasMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Descripcion,Marca,UnidadDeMedidaId,Existencia,Estado")] Articulo articulo)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) //debug
             {
                 // Aquí puedes registrar o inspeccionar el estado del modelo si no es válido
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
