@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SistemaComprasMVC.Data;
 using SistemaComprasMVC.Models;
@@ -56,17 +55,9 @@ namespace SistemaComprasMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,CedulaORNC,NombreComercial,Estado")] Proveedor proveedor)
         {
-            if (!esCedulaValida(proveedor.CedulaORNC) && !esUnRNCValido(proveedor.CedulaORNC))
-            {
-                ModelState.AddModelError("CedulaORNC", "La cédula o RNC es inválido.");
-            }
-            else if (!esCedulaValida(proveedor.CedulaORNC))
+            if (!esCedulaValida(proveedor.CedulaORNC))
             {
                 ModelState.AddModelError("CedulaORNC", "La cédula es inválida.");
-            }
-            else if (!esUnRNCValido(proveedor.CedulaORNC))
-            {
-                ModelState.AddModelError("CedulaORNC", "El RNC es inválido.");
             }
 
             if (ModelState.IsValid)
@@ -169,7 +160,7 @@ namespace SistemaComprasMVC.Controllers
             return (_context.Proveedores?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
-        // Métodos de validación
+        // Método de validación de cédula
         public static bool esCedulaValida(string pCedula)
         {
             int vnTotal = 0;
@@ -177,7 +168,7 @@ namespace SistemaComprasMVC.Controllers
             int pLongCed = vcCedula.Trim().Length;
             int[] digitoMult = new int[11] { 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1 };
 
-            if (pLongCed != 11) // Cambiar a "no es igual a 11"
+            if (pLongCed != 11)
                 return false;
 
             for (int vDig = 1; vDig <= pLongCed; vDig++)
@@ -189,31 +180,6 @@ namespace SistemaComprasMVC.Controllers
                     vnTotal += Int32.Parse(vCalculo.ToString().Substring(0, 1)) + Int32.Parse(vCalculo.ToString().Substring(1, 1));
             }
             return vnTotal % 10 == 0;
-        }
-
-        private bool esUnRNCValido(string pRNC)
-        {
-            int vnTotal = 0;
-            int[] digitoMult = new int[8] { 7, 9, 8, 6, 5, 4, 3, 2 };
-            string vcRNC = pRNC.Replace("-", "").Replace(" ", "");
-
-            if (vcRNC.Length != 9)
-                return false;
-
-            string vDigito = vcRNC.Substring(8, 1);
-
-            if (!"145".Contains(vcRNC.Substring(0, 1)))
-                return false;
-
-            for (int vDig = 1; vDig <= 8; vDig++)
-            {
-                int vCalculo = Int32.Parse(vcRNC.Substring(vDig - 1, 1)) * digitoMult[vDig - 1];
-                vnTotal += vCalculo;
-            }
-
-            return (vnTotal % 11 == 0 && vDigito == "1") ||
-                   (vnTotal % 11 == 1 && vDigito == "1") ||
-                   ((11 - (vnTotal % 11)).Equals(vDigito));
         }
     }
 }
