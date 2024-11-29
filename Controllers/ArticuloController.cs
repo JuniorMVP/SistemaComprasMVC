@@ -90,29 +90,26 @@ namespace SistemaComprasMVC.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(articulo);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ArticuloExists(articulo.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(articulo); // Actualizar el artículo en la base de datos
+                await _context.SaveChangesAsync(); // Guardar los cambios
             }
-            ViewData["UnidadDeMedidaId"] = new SelectList(_context.UnidadesDeMedida, "Id", "Descripcion", articulo.UnidadDeMedidaId);
-            return View(articulo);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ArticuloExists(articulo.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw; // Lanzar la excepción si no se puede actualizar
+                }
+            }
+
+            return RedirectToAction(nameof(Index)); // Redirigir a la lista de artículos
         }
+
 
         // GET: Articulo/Delete/5
         public async Task<IActionResult> Delete(int? id)
