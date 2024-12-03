@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Envío a Contabilidad";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- Formulario para filtrar las transacciones por fechas -->
+<form method="post" action="@Url.Action("Filtrar", "EnvioContabilidad")">
+    <div>
+        <label for="FechaDesde">Fecha Desde:</label>
+        <input type="date" id="FechaDesde" name="FechaDesde" required />
+    </div>
+    <div>
+        <label for="FechaHasta">Fecha Hasta:</label>
+        <input type="date" id="FechaHasta" name="FechaHasta" required />
+    </div>
+    <button type="submit">Filtrar</button>
+</form>
+
+@if (Model?.Count > 0)
+
+{
+    <!-- Formulario para enviar las transacciones seleccionadas a contabilidad -->
+    <form method="post" action="@Url.Action("Contabilizar", "EnvioContabilidad")">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Seleccionar</th>
+                    <th>Id. Transacción</th>
+                    <th>Descripción</th>
+                    <th>Fecha Transacción</th>
+                    <th>Monto</th>
+                    <th>Id. Asiento</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var transaccion in Model)
+                {
+                    <tr>
+                        <td>
+                            <!-- Checkbox para seleccionar transacciones -->
+                            <input type="checkbox" name="transaccionIds" value="@transaccion.IdTransaccion" />
+                        </td>
+                        <td>@transaccion.IdTransaccion</td>
+                        <td>@transaccion.Descripcion</td>
+                        <td>@transaccion.FechaTransaccion.ToString("dd/MM/yyyy")</td>
+                        <td>@transaccion.Monto</td>
+                        <td>
+                            @* Este campo debe permitir editar el Id. Asiento, si está permitido *@
+                            <input type="text" value="@transaccion.IdAsiento" disabled />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Botón para enviar las transacciones seleccionadas a contabilidad -->
+        <button type="submit">Contabilizar</button>
+    </form>
+}
+else
+{
+    <p>No se encontraron transacciones.</p>
+}
